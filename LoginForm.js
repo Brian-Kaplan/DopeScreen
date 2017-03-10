@@ -28,17 +28,12 @@ export default class LoginForm extends Component {
       colorAnim: new Animated.Value(0),
       logoFadeAnim: new Animated.Value(0),
       logoTransAnim: new Animated.ValueXY(),
-
       accountsListFadeAnim: new Animated.Value(0),
       addAccountFadeAnim: new Animated.Value(0),
-
       addAcountFormTransAnim: new Animated.ValueXY(),
-
       serverFadeAnim: new Animated.Value(0),
       indicatorAnim: new Animated.Value(0),
-
       formFadeAnim: new Animated.Value(0),
-
       indicating: false,
       serverPlaceholder: 'Server',
       usernamePlaceholder: 'Username',
@@ -46,7 +41,6 @@ export default class LoginForm extends Component {
       formIsEditable: false,
       serverIsEditable: false,
       isAddAccountDisabled: false,
-      navigator: null
     };
   }
 
@@ -123,23 +117,6 @@ export default class LoginForm extends Component {
     this.cycleColorAnimation();
   }
 
-  getStyle() {
-    return(
-     {
-       position: 'absolute',
-       justifyContent: 'center',
-       alignItems: 'center',
-       paddingBottom: 0,
-       top: 0,
-       left: 0,
-       bottom: 0,
-       right: 0,
-       opacity: this.state.logoFadeAnim,
-       transform: this.state.logoTransAnim.getTranslateTransform(),
-     }
-   )
-  }
-
   slideInAddAccountForm() {
     Animated.parallel([
       Animated.timing(
@@ -187,7 +164,7 @@ export default class LoginForm extends Component {
 
     return (
       <Animated.View style={[styles.container, {backgroundColor: interpolatedColorAnimation}]}>
-        <Animated.View style={this.getStyle()}>
+        <Animated.View style={[styles.appianLogo, { opacity: this.state.logoFadeAnim, transform: this.state.logoTransAnim.getTranslateTransform()}]}>
           <Image
             style={{height: 169, width: 300, resizeMode: 'contain', alignSelf: 'center'}}
             source={require('./Appian_white.png')} />
@@ -200,13 +177,6 @@ export default class LoginForm extends Component {
             <Account style={{marginBottom: 5}}/>
             <Account style={{marginBottom: 5}}/>
             <Account style={{marginBottom: 5}}/>
-            <Account style={{marginBottom: 5}}/>
-            <Account style={{marginBottom: 5}}/>
-            <Account style={{marginBottom: 5}}/>
-            <Account style={{marginBottom: 5}}/>
-            <Account style={{marginBottom: 5}}/>
-            <Account style={{marginBottom: 5}}/>
-            <Account style={{marginBottom: 5}}/>
           </ScrollView>
         </Animated.View>
 
@@ -214,33 +184,16 @@ export default class LoginForm extends Component {
           underlayColor={null}
           activeOpacity={.75}
           disabled={this.state.isAddAccountDisabled}
-          style={{
-            position: 'absolute',
-            zIndex: 1,
-            marginTop: 500,
-            height: 40,
-            justifyContent: 'center',
-            alignItems: 'center',
-            top: 0,
-            bottom: 0,
-            left: 0,
-            right: 0
-          }}
+          style={styles.addAccountButtonWrapper}
           onPress={() => {
             this.slideInAddAccountForm(),
             this.setState({serverIsEditable: true})
           }}>
             <Animated.View
-              style={{
-              opacity: this.state.addAccountFadeAnim,
-              height: 40,
-              width: 250,
-              borderWidth: 2,
-              borderRadius: 5,
-              borderColor: 'white',
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'center'}}>
+              style={[
+                styles.addAccountButton,
+                { opacity: this.state.addAccountFadeAnim }
+              ]}>
               <Image
                 style={{height: 20, width: 20, marginRight: 10}}
                 source={require('./iconmonstr-plus-6-240.png')} />
@@ -253,17 +206,12 @@ export default class LoginForm extends Component {
             </Animated.View>
         </TouchableHighlight>
 
-        <Animated.View style={{
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          zIndex: 0,
-          transform: this.state.addAcountFormTransAnim.getTranslateTransform()
-        }}>
+        <Animated.View style={[
+          styles.addAccountForm,
+          { transform: this.state.addAcountFormTransAnim.getTranslateTransform() }
+        ]}>
           <Animated.View
-            style={{
-              opacity: this.state.serverFadeAnim
-            }}>
+            style={{opacity: this.state.serverFadeAnim}}>
             <View style={styles.serverInputBox}>
               <TextInput
                 style={styles.serverInputText}
@@ -311,7 +259,6 @@ export default class LoginForm extends Component {
               underlineColorAndroid={'rgba(0,0,0,0)'}/>
           </Animated.View>
         </Animated.View>
-
       </Animated.View>
     )
   }
@@ -324,14 +271,49 @@ export default class LoginForm extends Component {
 }
 
 const styles = StyleSheet.create({
-  keyboardAvoidingView: {
-    justifyContent: 'center',
-  },
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'column'
+  },
+  appianLogo: {
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingBottom: 0,
+    top: 0,
+    left: 0,
+    bottom: 0,
+    right: 0
+  },
+  addAccountButtonWrapper: {
+    position: 'absolute',
+    zIndex: 1,
+    marginTop: 500,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0
+  },
+  addAccountButton: {
+    height: 40,
+    width: 250,
+    borderWidth: 2,
+    borderRadius: 5,
+    borderColor: 'white',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  addAccountForm: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 0
   },
   serverInputBox: {
     width: 300,
