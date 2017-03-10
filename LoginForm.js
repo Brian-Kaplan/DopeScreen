@@ -17,6 +17,9 @@ import {
   WebView
 } from 'react-native';
 
+import Account from './AccountComponent'
+
+
 export default class LoginForm extends Component {
 
   constructor(props) {
@@ -27,6 +30,7 @@ export default class LoginForm extends Component {
       serverBounceAnim: new Animated.ValueXY(),
       formFadeAnim: new Animated.Value(0),
       transAnim: new Animated.ValueXY(),
+      slideLeftAnim: new Animated.ValueXY(),
       colorAnim: new Animated.Value(0),
       indicatorAnim: new Animated.Value(0),
       indicating: false,
@@ -147,7 +151,12 @@ export default class LoginForm extends Component {
    )
   }
 
+  slideInAddAccountForm() {
+    console.log('test');
+  }
+
   renderLoginForm() {
+
     var interpolatedColorAnimation = this.state.colorAnim.interpolate({
         inputRange: [0, 100, 200, 300, 400, 500, 600],
         outputRange: [
@@ -178,7 +187,40 @@ export default class LoginForm extends Component {
             source={require('./Appian_white.png')} />
         </Animated.View>
 
-        <Animated.View style={{opacity: this.state.serverFadeAnim, transform: this.state.serverBounceAnim.getTranslateTransform()}}>
+        <Animated.View style={{opacity: this.state.serverFadeAnim, marginTop: 100}}>
+          <Account style={{marginBottom: 5}}/>
+          <Account style={{marginBottom: 5}}/>
+          <Account style={{marginBottom: 5}}/>
+          <Account style={{marginBottom: 5}}/>
+          <TouchableHighlight
+            underlayColor={null}
+            activeOpacity={.75}
+            style={{marginTop: 20}}
+            onPress={() => {
+              console.log('test');
+            }}>
+              <View
+                style={{
+                height: 40,
+                borderWidth: 2,
+                borderColor: 'white',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center'}}>
+                <Image
+                  style={{height: 20, width: 20, marginRight: 10}}
+                  source={require('./iconmonstr-plus-6-240.png')} />
+                <Text
+                  style={{
+                    color: 'white',
+                  }}>
+                    Add an Account
+                </Text>
+              </View>
+          </TouchableHighlight>
+        </Animated.View>
+
+        {/* <Animated.View style={{opacity: this.state.serverFadeAnim, transform: this.state.serverBounceAnim.getTranslateTransform()}}>
           <View style={styles.serverInputBox}>
             <TextInput
               style={styles.serverInputText}
@@ -224,7 +266,8 @@ export default class LoginForm extends Component {
             editable={this.state.formIsEditable}
             placeholderTextColor={'#ffffff'}
             underlineColorAndroid={'rgba(0,0,0,0)'}/>
-        </Animated.View>
+        </Animated.View> */}
+
       </Animated.View>
     )
   }
@@ -242,9 +285,9 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    justifyContent: 'center',
     alignItems: 'center',
-    flexDirection: 'column',
+    justifyContent: 'center',
+    flexDirection: 'column'
   },
   serverInputBox: {
     marginTop: 75,
