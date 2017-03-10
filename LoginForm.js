@@ -25,19 +25,27 @@ export default class LoginForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      logoFadeAnim: new Animated.Value(0),
-      serverFadeAnim: new Animated.Value(0),
-      serverBounceAnim: new Animated.ValueXY(),
-      formFadeAnim: new Animated.Value(0),
-      transAnim: new Animated.ValueXY(),
-      slideLeftAnim: new Animated.ValueXY(),
       colorAnim: new Animated.Value(0),
+      logoFadeAnim: new Animated.Value(0),
+      logoTransAnim: new Animated.ValueXY(),
+
+      accountsListFadeAnim: new Animated.Value(0),
+      addAccountFadeAnim: new Animated.Value(0),
+
+      addAcountFormTransAnim: new Animated.ValueXY(),
+
+      serverFadeAnim: new Animated.Value(0),
       indicatorAnim: new Animated.Value(0),
+
+      formFadeAnim: new Animated.Value(0),
+
       indicating: false,
       serverPlaceholder: 'Server',
       usernamePlaceholder: 'Username',
       passwordPlaceholder: 'Password',
       formIsEditable: false,
+      serverIsEditable: false,
+      isAddAccountDisabled: false,
       navigator: null
     };
   }
@@ -88,26 +96,6 @@ export default class LoginForm extends Component {
       }).start(() => this.validateServer());
     }
 
-  animateServerInputBox() {
-    Animated.sequence([
-      Animated.spring(this.state.serverBounceAnim,
-      {
-        friction: 10,
-        toValue: {x: -5, y: 0}
-      }),
-      Animated.spring(this.state.serverBounceAnim,
-      {
-        friction: 10,
-        toValue: {x: 5, y: 0}
-      }),
-      Animated.spring(this.state.serverBounceAnim,
-      {
-        friction: 10,
-        toValue: {x: 0, y:0}
-      })
-    ]).start()
-  }
-
   componentDidMount() {
     Animated.sequence([
       Animated.timing(
@@ -115,19 +103,20 @@ export default class LoginForm extends Component {
         {toValue: 1}
       ),
       Animated.parallel([
-        Animated.spring(this.state.transAnim,
-          {
+        Animated.spring(this.state.logoTransAnim, {
             friction: 4,
-            toValue: {x: 0, y: -150}
-          }
-        ),
+            toValue: {x: 0, y: -200}
+        }),
         Animated.timing(
-          this.state.serverFadeAnim,
-          {
+          this.state.accountsListFadeAnim, {
             duration: 1000,
             toValue: 1
-          }
-        )
+        }),
+        Animated.timing(
+          this.state.addAccountFadeAnim, {
+            duration: 1000,
+            toValue: 1
+        })
       ]
     )
     ]).start();
@@ -146,13 +135,30 @@ export default class LoginForm extends Component {
        bottom: 0,
        right: 0,
        opacity: this.state.logoFadeAnim,
-       transform: this.state.transAnim.getTranslateTransform(),
+       transform: this.state.logoTransAnim.getTranslateTransform(),
      }
    )
   }
 
   slideInAddAccountForm() {
-    console.log('test');
+    Animated.parallel([
+      Animated.timing(
+        this.state.accountsListFadeAnim, {
+          duration: 100,
+          toValue: 0
+      }),
+      Animated.timing(
+        this.state.serverFadeAnim, {
+          duration: 1000,
+          toValue: 1
+      }),
+      Animated.spring(
+        this.state.addAcountFormTransAnim, {
+          friction: 4,
+          toValue: {x: 0, y: -200}
+        }
+      )
+    ]).start();
   }
 
   renderLoginForm() {
@@ -187,86 +193,124 @@ export default class LoginForm extends Component {
             source={require('./Appian_white.png')} />
         </Animated.View>
 
-        <Animated.View style={{opacity: this.state.serverFadeAnim, marginTop: 100}}>
-          <Account style={{marginBottom: 5}}/>
-          <Account style={{marginBottom: 5}}/>
-          <Account style={{marginBottom: 5}}/>
-          <Account style={{marginBottom: 5}}/>
-          <TouchableHighlight
-            underlayColor={null}
-            activeOpacity={.75}
-            style={{marginTop: 20}}
-            onPress={() => {
-              console.log('test');
-            }}>
-              <View
+        <Animated.View style={{height: 200, opacity: this.state.accountsListFadeAnim, marginTop: 200}}>
+          <ScrollView>
+            <Account style={{marginBottom: 5}}/>
+            <Account style={{marginBottom: 5}}/>
+            <Account style={{marginBottom: 5}}/>
+            <Account style={{marginBottom: 5}}/>
+            <Account style={{marginBottom: 5}}/>
+            <Account style={{marginBottom: 5}}/>
+            <Account style={{marginBottom: 5}}/>
+            <Account style={{marginBottom: 5}}/>
+            <Account style={{marginBottom: 5}}/>
+            <Account style={{marginBottom: 5}}/>
+            <Account style={{marginBottom: 5}}/>
+            <Account style={{marginBottom: 5}}/>
+          </ScrollView>
+        </Animated.View>
+
+        <TouchableHighlight
+          underlayColor={null}
+          activeOpacity={.75}
+          disabled={this.state.isAddAccountDisabled}
+          style={{
+            position: 'absolute',
+            zIndex: 1,
+            marginTop: 500,
+            height: 40,
+            justifyContent: 'center',
+            alignItems: 'center',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0
+          }}
+          onPress={() => {
+            this.slideInAddAccountForm(),
+            this.setState({serverIsEditable: true})
+          }}>
+            <Animated.View
+              style={{
+              opacity: this.state.addAccountFadeAnim,
+              height: 40,
+              width: 250,
+              borderWidth: 2,
+              borderRadius: 5,
+              borderColor: 'white',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'center'}}>
+              <Image
+                style={{height: 20, width: 20, marginRight: 10}}
+                source={require('./iconmonstr-plus-6-240.png')} />
+              <Text
                 style={{
-                height: 40,
-                borderWidth: 2,
-                borderColor: 'white',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center'}}>
-                <Image
-                  style={{height: 20, width: 20, marginRight: 10}}
-                  source={require('./iconmonstr-plus-6-240.png')} />
-                <Text
-                  style={{
-                    color: 'white',
-                  }}>
-                    Add an Account
-                </Text>
-              </View>
-          </TouchableHighlight>
-        </Animated.View>
+                  color: 'white',
+                }}>
+                  Add an Account
+              </Text>
+            </Animated.View>
+        </TouchableHighlight>
 
-        {/* <Animated.View style={{opacity: this.state.serverFadeAnim, transform: this.state.serverBounceAnim.getTranslateTransform()}}>
-          <View style={styles.serverInputBox}>
+        <Animated.View style={{
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: 0,
+          transform: this.state.addAcountFormTransAnim.getTranslateTransform()
+        }}>
+          <Animated.View
+            style={{
+              opacity: this.state.serverFadeAnim
+            }}>
+            <View style={styles.serverInputBox}>
+              <TextInput
+                style={styles.serverInputText}
+                onChangeText={(serverText) => this.setState({serverText})}
+                value={this.state.serverText}
+                editable={this.state.serverIsEditable}
+                placeholder={this.state.serverPlaceholder}
+                onFocus={() => this.setState({serverPlaceholder: ''})}
+                onEndEditing={() => this.setState({serverPlaceholder: 'Server'})}
+                autoCorrect={false}
+                autoCapitalize={'none'}
+                placeholderTextColor={'#ffffff'}
+                underlineColorAndroid={'rgba(0,0,0,0)'}
+                onSubmitEditing={(event) => (
+                  this.animateWorkingIndicator()
+                )}/>
+                {spinner}
+            </View>
+          </Animated.View>
+
+          <Animated.View style={{opacity: this.state.formFadeAnim}}>
             <TextInput
-              style={styles.serverInputText}
-              onChangeText={(serverText) => this.setState({serverText})}
-              value={this.state.serverText}
-              placeholder={this.state.serverPlaceholder}
-              onFocus={() => this.setState({serverPlaceholder: ''})}
-              onEndEditing={() => this.setState({serverPlaceholder: 'Server'})}
-              autoCorrect={false}
+              style={styles.textInput}
+              onChangeText={(usernameText) => this.setState({usernameText})}
+              value={this.state.usernameText}
               autoCapitalize={'none'}
+              autoCorrect={false}
+              editable={this.state.formIsEditable}
+              placeholder={this.state.usernamePlaceholder}
+              onFocus={() => this.setState({usernamePlaceholder: ''})}
+              onEndEditing={() => this.setState({usernamePlaceholder: 'Username'})}
               placeholderTextColor={'#ffffff'}
-              underlineColorAndroid={'rgba(0,0,0,0)'}
-              onSubmitEditing={(event) => (
-                this.animateWorkingIndicator()
-              )}/>
+              underlineColorAndroid={'rgba(0,0,0,0)'}/>
 
-              {spinner}
-          </View>
+           <TextInput
+              style={styles.textInput}
+              onChangeText={(passwordText) => this.setState({passwordText})}
+              value={this.state.passwordText}
+              placeholder={this.state.passwordPlaceholder}
+              onFocus={() => this.setState({passwordPlaceholder: ''})}
+              onEndEditing={() => this.setState({passwordPlaceholder: 'Password'})}
+              secureTextEntry={true}
+              editable={this.state.formIsEditable}
+              placeholderTextColor={'#ffffff'}
+              underlineColorAndroid={'rgba(0,0,0,0)'}/>
+          </Animated.View>
         </Animated.View>
-
-        <Animated.View style={{opacity: this.state.formFadeAnim}}>
-          <TextInput
-            style={styles.textInput}
-            onChangeText={(usernameText) => this.setState({usernameText})}
-            value={this.state.usernameText}
-            autoCapitalize={'none'}
-            autoCorrect={false}
-            editable={this.state.formIsEditable}
-            placeholder={this.state.usernamePlaceholder}
-            onFocus={() => this.setState({usernamePlaceholder: ''})}
-            onEndEditing={() => this.setState({usernamePlaceholder: 'Username'})}
-            placeholderTextColor={'#ffffff'}
-            underlineColorAndroid={'rgba(0,0,0,0)'}/>
-
-         <TextInput
-            style={styles.textInput}
-            onChangeText={(passwordText) => this.setState({passwordText})}
-            value={this.state.passwordText}
-            placeholder={this.state.passwordPlaceholder}
-            onFocus={() => this.setState({passwordPlaceholder: ''})}
-            onEndEditing={() => this.setState({passwordPlaceholder: 'Password'})}
-            secureTextEntry={true}
-            editable={this.state.formIsEditable}
-            placeholderTextColor={'#ffffff'}
-            underlineColorAndroid={'rgba(0,0,0,0)'}/>
-        </Animated.View> */}
 
       </Animated.View>
     )
@@ -290,13 +334,12 @@ const styles = StyleSheet.create({
     flexDirection: 'column'
   },
   serverInputBox: {
-    marginTop: 75,
-    marginLeft: 50,
     width: 300,
     flexDirection: 'row',
     alignItems: 'center',
   },
   serverInputText: {
+    marginLeft: 25,
     height: 40,
     width: 250,
     borderColor: 'white',
