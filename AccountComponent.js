@@ -17,13 +17,19 @@ export default class Account extends Component {
   render() {
     return (
       <Animated.View style={this.props.style}>
-        <View style={{flexDirection: 'row'}}>
+        <View style={{flexDirection: 'row', alignItems: 'center'}}>
           <Image
               style={styles.icon}
+              overflow={'hidden'}
               source={require('./brian_kaplan_180.jpg')}/>
-          <View style={{marginLeft: 20, flexDirection: 'column'}}>
+          <View style={{marginLeft: 5, flexDirection: 'column'}}>
             <Text style={{color: 'white'}}>brian.kaplan</Text>
-            <Text style={{color: 'white'}}>https://daily.appianci.net</Text>
+            <Text
+              style={{color: 'white'}}
+              ellipsizeMode={'tail'}
+              numberOfLines={1}>
+              https://daily.appianci.netadasdasdadaads
+            </Text>
           </View>
       </View>
       </Animated.View>
@@ -37,18 +43,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row'
   },
   icon: {
-    height: 40,
-     width: 40,
+     height: 50,
+     width: 50,
      resizeMode: 'contain',
      alignSelf: 'center',
-     borderRadius: 20,
+     borderRadius: 25,
      borderColor: 'white',
      borderWidth: 1
-  },
-  serverText: {
-
-  },
-  usernameText: {
-
   }
 })

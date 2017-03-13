@@ -4,21 +4,15 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  Button,
   View,
   Image,
   Animated,
-  Alert,
   TouchableHighlight,
   ActivityIndicator,
-  ScrollView,
-  KeyboardAvoidingView,
-  Navigator,
-  WebView
+  ScrollView
 } from 'react-native';
 
 import Account from './AccountComponent'
-
 
 export default class LoginForm extends Component {
 
@@ -31,35 +25,33 @@ export default class LoginForm extends Component {
       accountsListFadeAnim: new Animated.Value(0),
       addAccountFadeAnim: new Animated.Value(0),
       addAcountFormTransAnim: new Animated.ValueXY(),
+      spinAnim: new Animated.Value(0),
+      bottomTextAnim: new Animated.Value(1),
       serverFadeAnim: new Animated.Value(0),
       indicatorAnim: new Animated.Value(0),
       formFadeAnim: new Animated.Value(0),
+      isAddAccountFormShowing: false,
       indicating: false,
-      serverPlaceholder: 'Server',
+      serverPlaceholder: 'https://',
       usernamePlaceholder: 'Username',
       passwordPlaceholder: 'Password',
       formIsEditable: false,
       serverIsEditable: false,
       isAddAccountDisabled: false,
+      bottomButtonText: 'Add an Account'
     };
   }
 
   // Looping animation of the background color
   cycleColorAnimation() {
-    Animated.sequence([
-      Animated.timing(
-        this.state.colorAnim, {
-          toValue: 600,
-          duration: 30000
-      }),
-      Animated.timing(
-        this.state.colorAnim, {
-          toValue: 0,
-          duration: 30000
-      })
-    ]).start(() => {
+    Animated.timing(
+    this.state.colorAnim, {
+      toValue: 1150,
+      duration: 50000
+    }).start(() => {
+      this.setState({colorAnim: new Animated.Value(0)});
       this.cycleColorAnimation();
-    });
+      });
   }
 
   enableForm() {
@@ -117,11 +109,56 @@ export default class LoginForm extends Component {
     this.cycleColorAnimation();
   }
 
-  slideInAddAccountForm() {
+  slideInAccountsList() {
+    this.setState({isAddAccountFormShowing: false})
     Animated.parallel([
       Animated.timing(
         this.state.accountsListFadeAnim, {
+          duration: 1000,
+          toValue: 1
+      }),
+      Animated.timing(
+        this.state.serverFadeAnim, {
           duration: 100,
+          toValue: 0
+      }),
+      Animated.timing(
+        this.state.formFadeAnim, {
+          toValue: 0,
+          duration: 100
+      }),
+      Animated.spring(
+        this.state.addAcountFormTransAnim, {
+          friction: 4,
+          toValue: {x: 0, y: 0}
+      }),
+      Animated.timing(
+        this.state.spinAnim, {
+          toValue: 0,
+          duration: 1000
+      })
+    ]).start();
+
+    Animated.timing(
+      this.state.bottomTextAnim, {
+        toValue: 0,
+        duration: 300
+    }).start(() => {
+      this.setState({bottomButtonText: 'Add an Account'});
+      Animated.timing(
+        this.state.bottomTextAnim, {
+          toValue: 1,
+          duration: 300
+        }).start()
+    })
+  }
+
+  slideInAddAccountForm() {
+    this.setState({isAddAccountFormShowing: true})
+    Animated.parallel([
+      Animated.timing(
+        this.state.accountsListFadeAnim, {
+          duration: 300,
           toValue: 0
       }),
       Animated.timing(
@@ -131,25 +168,53 @@ export default class LoginForm extends Component {
       }),
       Animated.spring(
         this.state.addAcountFormTransAnim, {
-          friction: 4,
-          toValue: {x: 0, y: -200}
-        }
-      )
+          friction: 6,
+          toValue: {x: 0, y: -250}
+      }),
+      Animated.timing(
+        this.state.spinAnim, {
+          toValue: 1,
+          duration: 1000
+      })
     ]).start();
+
+    Animated.timing(
+      this.state.bottomTextAnim, {
+        toValue: 0,
+        duration: 300
+    }).start(() => {
+      this.setState({bottomButtonText: 'Cancel'});
+      Animated.timing(
+        this.state.bottomTextAnim, {
+          toValue: 1,
+          duration: 300
+        }).start()
+    })
   }
 
   renderLoginForm() {
 
     var interpolatedColorAnimation = this.state.colorAnim.interpolate({
-        inputRange: [0, 100, 200, 300, 400, 500, 600],
+        inputRange: [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1150],
         outputRange: [
-          'rgba(33, 150, 243, 1)',
-          'rgba(63, 81, 181, 1)',
-          'rgba(156, 39, 176, 1)',
-          'rgba(244, 67, 54, 1)',
-          'rgba(255, 152, 0, 1)',
-          'rgba(255, 235, 59, 1)',
-          'rgba(76, 175, 80, 1)']
+          'rgba(226, 32, 45, 1)', // Red
+          'rgba(63, 167, 206, 1)', // Light Blue
+          'rgba(76, 175, 80, 1)', // Green
+          'rgba(28, 59, 99, 1)', // Less dark blue
+          'rgba(15, 32, 58, 1)', //Dark Blue
+          'rgba(158, 126, 202, 1)', // Purple
+          'rgba(226, 32, 45, 1)', // Red
+          'rgba(63, 167, 206, 1)', // Light Blue
+          'rgba(76, 175, 80, 1)', // Green
+          'rgba(28, 59, 99, 1)', // Less dark blue
+          'rgba(15, 32, 58, 1)', //Dark Blue
+          'rgba(158, 126, 202, 1)', // Purple
+          'rgba(226, 32, 45, 1)'] // Red
+    });
+
+    var spinCancelButtonInterpolation = this.state.spinAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: ['0deg', '315deg']
     });
 
     let spinner = (this.state.indicating) ? (
@@ -164,52 +229,67 @@ export default class LoginForm extends Component {
 
     return (
       <Animated.View style={[styles.container, {backgroundColor: interpolatedColorAnimation}]}>
+
+        {/* Appian Logo */}
         <Animated.View style={[styles.appianLogo, { opacity: this.state.logoFadeAnim, transform: this.state.logoTransAnim.getTranslateTransform()}]}>
           <Image
             style={{height: 169, width: 300, resizeMode: 'contain', alignSelf: 'center'}}
             source={require('./Appian_white.png')} />
         </Animated.View>
 
-        <Animated.View style={{height: 200, width: 250, opacity: this.state.accountsListFadeAnim, marginTop: 200}}>
-          <ScrollView style={{borderWidth: 2, borderColor: 'white', padding: 10}}>
-            <Account style={{marginBottom: 5}}/>
-            <Account style={{marginBottom: 5}}/>
-            <Account style={{marginBottom: 5}}/>
-            <Account style={{marginBottom: 5}}/>
-            <Account style={{marginBottom: 5}}/>
+        {/* Accounts List */}
+        <Animated.View
+          style={{
+            borderColor: 'white',
+            borderRadius: 5,
+            borderWidth: 2,
+            height: 250,
+            width: 250,
+            opacity: this.state.accountsListFadeAnim,
+            marginTop: 200}}>
+          <ScrollView
+            horizontal={true}>
+            <ScrollView
+              contentContainerStyle={{margin: 10}}>
+              <Account style={{marginBottom: 5}}/>
+              <Account style={{marginBottom: 5}}/>
+              <Account style={{marginBottom: 5}}/>
+              <Account style={{marginBottom: 5}}/>
+              <Account style={{marginBottom: 5}}/>
+            </ScrollView>
           </ScrollView>
         </Animated.View>
 
+        {/* Add Account Button */}
         <TouchableHighlight
           underlayColor={null}
           activeOpacity={.75}
           disabled={this.state.isAddAccountDisabled}
           style={styles.addAccountButtonWrapper}
           onPress={() => {
-            this.slideInAddAccountForm(),
-            this.setState({serverIsEditable: true})
-          }}>
+            if (this.state.isAddAccountFormShowing) {
+              this.slideInAccountsList();
+            } else {
+              this.slideInAddAccountForm();
+              this.setState({serverIsEditable: true});
+            }}}>
             <Animated.View
-              style={[
-                styles.addAccountButton,
-                { opacity: this.state.addAccountFadeAnim }
-              ]}>
-              <Image
-                style={{height: 20, width: 20, marginRight: 10}}
+              style={[styles.addAccountButton, {opacity: this.state.addAccountFadeAnim}]}>
+              <Animated.Image
+                style={{height: 20, width: 20, marginRight: 10, transform: [{rotate: spinCancelButtonInterpolation}] }}
                 source={require('./iconmonstr-plus-6-240.png')} />
-              <Text
-                style={{
-                  color: 'white',
-                }}>
-                  Add an Account
-              </Text>
+                <View style={{marginRight: 20, width: 150, justifyContent: 'center', alignItems: 'center'}}>
+                  <Animated.Text
+                    style={{color: 'white', opacity: this.state.bottomTextAnim}}>
+                      {this.state.bottomButtonText}
+                  </Animated.Text>
+                </View>
             </Animated.View>
         </TouchableHighlight>
 
-        <Animated.View style={[
-          styles.addAccountForm,
-          { transform: this.state.addAcountFormTransAnim.getTranslateTransform() }
-        ]}>
+        {/* Add Account Form */}
+        <Animated.View
+          style={[ styles.addAccountForm, {transform: this.state.addAcountFormTransAnim.getTranslateTransform()}]}>
           <Animated.View
             style={{opacity: this.state.serverFadeAnim}}>
             <View style={styles.serverInputBox}>
