@@ -170,8 +170,8 @@ export default class LoginForm extends Component {
             source={require('./Appian_white.png')} />
         </Animated.View>
 
-        <Animated.View style={{height: 200, opacity: this.state.accountsListFadeAnim, marginTop: 200}}>
-          <ScrollView>
+        <Animated.View style={{height: 200, width: 250, opacity: this.state.accountsListFadeAnim, marginTop: 200}}>
+          <ScrollView style={{borderWidth: 2, borderColor: 'white', padding: 10}}>
             <Account style={{marginBottom: 5}}/>
             <Account style={{marginBottom: 5}}/>
             <Account style={{marginBottom: 5}}/>
