@@ -1,5 +1,6 @@
 import React, { Component, PropTypes } from 'react';
 import {
+  Dimensions,
   AppRegistry,
   StyleSheet,
   Text,
@@ -9,7 +10,8 @@ import {
   Animated,
   TouchableHighlight,
   ActivityIndicator,
-  ScrollView
+  ScrollView,
+  KeyboardAvoidingView
 } from 'react-native';
 
 import Account from './AccountComponent'
@@ -19,26 +21,25 @@ export default class LoginForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      spinAnim: new Animated.Value(0),
       colorAnim: new Animated.Value(0),
       logoFadeAnim: new Animated.Value(0),
-      logoTransAnim: new Animated.ValueXY(),
-      accountsListFadeAnim: new Animated.Value(0),
-      addAccountFadeAnim: new Animated.Value(0),
-      addAcountFormTransAnim: new Animated.ValueXY(),
-      spinAnim: new Animated.Value(0),
+      formFadeAnim: new Animated.Value(0),
+      indicatorAnim: new Animated.Value(0),
       bottomTextAnim: new Animated.Value(1),
       serverFadeAnim: new Animated.Value(0),
-      indicatorAnim: new Animated.Value(0),
-      formFadeAnim: new Animated.Value(0),
-      isAddAccountFormShowing: false,
+      logoTransAnim: new Animated.ValueXY(),
+      addAccountFadeAnim: new Animated.Value(0),
+      accountsListFadeAnim: new Animated.Value(0),
+      addAcountFormTransAnim: new Animated.ValueXY(),
       indicating: false,
-      serverPlaceholder: 'https://',
-      usernamePlaceholder: 'Username',
-      passwordPlaceholder: 'Password',
       formIsEditable: false,
       serverIsEditable: false,
+      usernameIsEditable: false,
+      passwordIsEditable: false,
       isAddAccountDisabled: false,
-      bottomButtonText: 'Add an Account'
+      isAddAccountFormShowing: false,
+      bottomButtonText: 'ADD ACCOUNT'
     };
   }
 
@@ -47,7 +48,7 @@ export default class LoginForm extends Component {
     Animated.timing(
     this.state.colorAnim, {
       toValue: 1150,
-      duration: 50000
+      duration: 60000
     }).start(() => {
       this.setState({colorAnim: new Animated.Value(0)});
       this.cycleColorAnimation();
@@ -144,7 +145,7 @@ export default class LoginForm extends Component {
         toValue: 0,
         duration: 300
     }).start(() => {
-      this.setState({bottomButtonText: 'Add an Account'});
+      this.setState({bottomButtonText: 'ADD ACCOUNT'});
       Animated.timing(
         this.state.bottomTextAnim, {
           toValue: 1,
@@ -183,7 +184,7 @@ export default class LoginForm extends Component {
         toValue: 0,
         duration: 300
     }).start(() => {
-      this.setState({bottomButtonText: 'Cancel'});
+      this.setState({bottomButtonText: 'CANCEL'});
       Animated.timing(
         this.state.bottomTextAnim, {
           toValue: 1,
@@ -193,6 +194,12 @@ export default class LoginForm extends Component {
   }
 
   renderLoginForm() {
+
+    const staticStrings = {
+        serverPlaceholder: 'example.com',
+        usernamePlaceholder: 'Username',
+        passwordPlaceholder: 'Password'
+      };
 
     var interpolatedColorAnimation = this.state.colorAnim.interpolate({
         inputRange: [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1150],
@@ -227,118 +234,144 @@ export default class LoginForm extends Component {
         null
       );
 
+    const { width } = Dimensions.get('window');
+    const refCallback = (node) => this.scrollRef = node;
+
     return (
       <Animated.View style={[styles.container, {backgroundColor: interpolatedColorAnimation}]}>
+        <ScrollView
+          ref={refCallback}
+          centerContent={true}
+          // scrollEnabled={this.state.isAddAccountFormShowing}
+          contentContainerStyle={{height: 750, width: width }}
+          showsVerticalScrollIndicator={false}>
 
-        {/* Appian Logo */}
-        <Animated.View style={[styles.appianLogo, { opacity: this.state.logoFadeAnim, transform: this.state.logoTransAnim.getTranslateTransform()}]}>
-          <Image
-            style={{height: 169, width: 300, resizeMode: 'contain', alignSelf: 'center'}}
-            source={require('./Appian_white.png')} />
-        </Animated.View>
+          {/* Appian Logo */}
+          <Animated.View style={[styles.appianLogo, { opacity: this.state.logoFadeAnim, transform: this.state.logoTransAnim.getTranslateTransform()}]}>
+            <Image
+              style={{height: 169, width: 300, resizeMode: 'contain', alignSelf: 'center'}}
+              source={require('./Appian_white.png')} />
+          </Animated.View>
 
-        {/* Accounts List */}
-        <Animated.View
-          style={{
-            borderColor: 'white',
-            borderRadius: 5,
-            borderWidth: 2,
-            height: 250,
-            width: 250,
-            opacity: this.state.accountsListFadeAnim,
-            marginTop: 200}}>
-          <ScrollView
-            horizontal={true}>
-            <ScrollView
-              contentContainerStyle={{margin: 10}}>
-              <Account style={{marginBottom: 5}}/>
-              <Account style={{marginBottom: 5}}/>
-              <Account style={{marginBottom: 5}}/>
-              <Account style={{marginBottom: 5}}/>
-              <Account style={{marginBottom: 5}}/>
-            </ScrollView>
-          </ScrollView>
-        </Animated.View>
-
-        {/* Add Account Button */}
-        <TouchableHighlight
-          underlayColor={null}
-          activeOpacity={.75}
-          disabled={this.state.isAddAccountDisabled}
-          style={styles.addAccountButtonWrapper}
-          onPress={() => {
-            if (this.state.isAddAccountFormShowing) {
-              this.slideInAccountsList();
-            } else {
-              this.slideInAddAccountForm();
-              this.setState({serverIsEditable: true});
-            }}}>
-            <Animated.View
-              style={[styles.addAccountButton, {opacity: this.state.addAccountFadeAnim}]}>
-              <Animated.Image
-                style={{height: 20, width: 20, marginRight: 10, transform: [{rotate: spinCancelButtonInterpolation}] }}
-                source={require('./iconmonstr-plus-6-240.png')} />
-                <View style={{marginRight: 20, width: 150, justifyContent: 'center', alignItems: 'center'}}>
-                  <Animated.Text
-                    style={{color: 'white', opacity: this.state.bottomTextAnim}}>
-                      {this.state.bottomButtonText}
-                  </Animated.Text>
-                </View>
-            </Animated.View>
-        </TouchableHighlight>
-
-        {/* Add Account Form */}
-        <Animated.View
-          style={[ styles.addAccountForm, {transform: this.state.addAcountFormTransAnim.getTranslateTransform()}]}>
+          {/* Accounts List */}
           <Animated.View
-            style={{opacity: this.state.serverFadeAnim}}>
-            <View style={styles.serverInputBox}>
-              <TextInput
-                style={styles.serverInputText}
-                onChangeText={(serverText) => this.setState({serverText})}
-                value={this.state.serverText}
-                editable={this.state.serverIsEditable}
-                placeholder={this.state.serverPlaceholder}
-                onFocus={() => this.setState({serverPlaceholder: ''})}
-                onEndEditing={() => this.setState({serverPlaceholder: 'Server'})}
-                autoCorrect={false}
-                autoCapitalize={'none'}
-                placeholderTextColor={'#ffffff'}
-                underlineColorAndroid={'rgba(0,0,0,0)'}
-                onSubmitEditing={(event) => (
-                  this.animateWorkingIndicator()
-                )}/>
-                {spinner}
-            </View>
+            style={{
+              borderColor: 'white',
+              borderRadius: 5,
+              borderWidth: 2,
+              height: 250,
+              alignSelf: 'center',
+              width: 300,
+              opacity: this.state.accountsListFadeAnim,
+              marginTop: 200}}>
+            <ScrollView
+              horizontal={true}>
+              <ScrollView
+                contentContainerStyle={{margin: 10}}>
+                <Account
+                  domain={"https://home.appian.com/suite/tempo/tasks/assignedtome"}
+                  style={{marginBottom: 5}}/>
+                <Account
+                  domain={"https://daily.appianci.net/suite/sites/aw17-integration-demos"}
+                  style={{marginBottom: 5}}/>
+                <Account
+                  domain={"https://daily.appianci.net/suite/sites/buttoncolumns"}
+                  style={{marginBottom: 5}}/>
+                <Account
+                  domain={"https://daily.appianci.net/suite/sites/buttoncolumns"}
+                  style={{marginBottom: 5}}/>
+                <Account
+                  domain={"https://daily.appianci.net/suite/sites/buttoncolumns"}
+                  style={{marginBottom: 5}}/>
+              </ScrollView>
+            </ScrollView>
           </Animated.View>
 
-          <Animated.View style={{opacity: this.state.formFadeAnim}}>
-            <TextInput
-              style={styles.textInput}
-              onChangeText={(usernameText) => this.setState({usernameText})}
-              value={this.state.usernameText}
-              autoCapitalize={'none'}
-              autoCorrect={false}
-              editable={this.state.formIsEditable}
-              placeholder={this.state.usernamePlaceholder}
-              onFocus={() => this.setState({usernamePlaceholder: ''})}
-              onEndEditing={() => this.setState({usernamePlaceholder: 'Username'})}
-              placeholderTextColor={'#ffffff'}
-              underlineColorAndroid={'rgba(0,0,0,0)'}/>
+          {/* Add Account Form */}
+            <Animated.View
+              style={[ styles.addAccountForm, {transform: this.state.addAcountFormTransAnim.getTranslateTransform()}]}>
+                <Animated.View
+                  style={{opacity: this.state.serverFadeAnim}}>
+                  <View style={styles.serverRow}>
+                    <View style={styles.serverInputBox}>
+                      <Text style={{paddingLeft: 10, paddingRight: 1, color: 'white', fontStyle: 'italic'}}>https://</Text>
+                      <TextInput
+                        style={styles.serverInputText}
+                        onChangeText={(serverText) => this.setState({serverText: serverText})}
+                        value={this.state.serverText}
+                        editable={this.state.serverIsEditable}
+                        placeholder={staticStrings.serverPlaceholder}
+                        autoCorrect={false}
+                        autoCapitalize={'none'}
+                        placeholderTextColor={'#ffffff'}
+                        underlineColorAndroid={'rgba(0,0,0,0)'}
+                        onSubmitEditing={(event) => (
+                          this.animateWorkingIndicator()
+                        )}/>
+                    </View>
+                      {spinner}
+                  </View>
 
-           <TextInput
-              style={styles.textInput}
-              onChangeText={(passwordText) => this.setState({passwordText})}
-              value={this.state.passwordText}
-              placeholder={this.state.passwordPlaceholder}
-              onFocus={() => this.setState({passwordPlaceholder: ''})}
-              onEndEditing={() => this.setState({passwordPlaceholder: 'Password'})}
-              secureTextEntry={true}
-              editable={this.state.formIsEditable}
-              placeholderTextColor={'#ffffff'}
-              underlineColorAndroid={'rgba(0,0,0,0)'}/>
-          </Animated.View>
-        </Animated.View>
+                  <TextInput
+                    style={styles.textInput }
+                    onChangeText={(usernameText) => this.setState({usernameText})}
+                    value={this.state.usernameText}
+                    editable={this.state.usernameIsEditable}
+                    autoCapitalize={'none'}
+                    autoCorrect={false}
+                    placeholder={staticStrings.usernamePlaceholder}
+                    placeholderTextColor={'#ffffff'}
+                    underlineColorAndroid={'rgba(0,0,0,0)'}/>
+
+                   <TextInput
+                      style={styles.textInput}
+                      onChangeText={(passwordText) => this.setState({passwordText})}
+                      value={this.state.passwordText}
+                      editable={this.state.passwordIsEditable}
+                      placeholder={staticStrings.passwordPlaceholder}
+                      secureTextEntry={true}
+                      placeholderTextColor={'#ffffff'}
+                      underlineColorAndroid={'rgba(0,0,0,0)'}/>
+                </Animated.View>
+            </Animated.View>
+
+          {/* Add Account Button */}
+          <TouchableHighlight
+            underlayColor={null}
+            activeOpacity={.6}
+            disabled={this.state.isAddAccountDisabled}
+            style={styles.addAccountButtonWrapper}
+            onPress={() => {
+              if (this.state.isAddAccountFormShowing) {
+                this.slideInAccountsList();
+                this.setState({
+                  serverIsEditable: false,
+                  usernameIsEditable: false,
+                  passwordIsEditable: false}
+                );
+                this.scrollRef.scrollTo({x: 0, y: 0, animated: true});
+              } else {
+                this.slideInAddAccountForm();
+                this.setState({
+                  serverIsEditable: true,
+                  usernameIsEditable: true,
+                  passwordIsEditable: true}
+                );
+              }}}>
+              <Animated.View
+                style={[styles.addAccountButton, {opacity: this.state.addAccountFadeAnim}]}>
+                <Animated.Image
+                  style={{height: 20, width: 20, transform: [{rotate: spinCancelButtonInterpolation}] }}
+                  source={require('./iconmonstr-plus-6-240.png')} />
+                  <View style={{width: 150, justifyContent: 'center', alignItems: 'center'}}>
+                    <Animated.Text
+                      style={{fontWeight: '600', fontSize: 14, color: 'white', opacity: this.state.bottomTextAnim}}>
+                        {this.state.bottomButtonText}
+                    </Animated.Text>
+                  </View>
+              </Animated.View>
+          </TouchableHighlight>
+        </ScrollView>
       </Animated.View>
     )
   }
@@ -358,26 +391,18 @@ const styles = StyleSheet.create({
     flexDirection: 'column'
   },
   appianLogo: {
-    position: 'absolute',
     justifyContent: 'center',
     alignItems: 'center',
     paddingBottom: 0,
-    top: 0,
-    left: 0,
-    bottom: 0,
-    right: 0
+    marginBottom: 100,
+    ...StyleSheet.absoluteFillObject
   },
   addAccountButtonWrapper: {
-    position: 'absolute',
     zIndex: 1,
     marginTop: 500,
     height: 40,
-    justifyContent: 'center',
     alignItems: 'center',
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0
+    ...StyleSheet.absoluteFillObject
   },
   addAccountButton: {
     height: 40,
@@ -395,19 +420,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 0
   },
-  serverInputBox: {
+  serverRow: {
     width: 300,
     flexDirection: 'row',
     alignItems: 'center',
   },
-  serverInputText: {
+  serverInputBox: {
     marginLeft: 25,
+    flexDirection: 'row',
     height: 40,
     width: 250,
+    alignItems: 'center',
     borderColor: 'white',
-    borderWidth: 2,
-    borderRadius: 5,
-    textAlign: 'center',
+    borderWidth: 1
+  },
+  serverInputText: {
+    fontSize: 14,
+    height: 40,
+    width: 190,
+    marginRight: 100,
+    textAlign: 'left',
+    fontStyle: 'italic',
     color: '#ffffff'
   },
   textInput: {
@@ -415,25 +448,13 @@ const styles = StyleSheet.create({
     width: 250,
     color: '#ffffff',
     borderColor: 'white',
-    borderWidth: 2,
-    borderRadius: 5,
+    borderWidth: 1,
     alignSelf: 'center',
     marginTop: 20,
-    textAlign: 'center'
-  },
-  submitButton: {
-    marginTop: 25,
-    width: 100,
-    height: 40,
-    borderWidth: 2,
-    borderRadius: 5,
-    borderColor: 'white',
-    alignSelf: 'center',
-    justifyContent: 'center'
-  },
-  submitText: {
-    color: '#999',
-    alignSelf: 'center'
+    textAlign: 'left',
+    fontStyle: 'italic',
+    paddingLeft: 10,
+    fontSize: 14
   },
   indicator: {
     marginLeft: 10

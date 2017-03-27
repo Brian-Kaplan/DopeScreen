@@ -7,6 +7,8 @@ import {
   Animated,
   View
 } from 'react-native';
+import styles from './AccountComponentStyleSheet';
+
 
 export default class Account extends Component {
 
@@ -26,9 +28,9 @@ export default class Account extends Component {
             <Text style={{color: 'white'}}>brian.kaplan</Text>
             <Text
               style={{color: 'white'}}
-              ellipsizeMode={'tail'}
+              ellipsizeMode={'middle'}
               numberOfLines={1}>
-              https://daily.appianci.netadasdasdadaads
+              {this.props.domain}
             </Text>
           </View>
       </View>
@@ -36,19 +38,3 @@ export default class Account extends Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    flexDirection: 'row'
-  },
-  icon: {
-     height: 50,
-     width: 50,
-     resizeMode: 'contain',
-     alignSelf: 'center',
-     borderRadius: 25,
-     borderColor: 'white',
-     borderWidth: 1
-  }
-})
