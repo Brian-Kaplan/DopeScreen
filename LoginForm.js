@@ -30,7 +30,6 @@ export default class LoginForm extends Component {
       accountsListFadeAnim: new Animated.Value(0),
       workingIndicatorAnim: new Animated.Value(0),
       addAcountFormTransAnim: new Animated.ValueXY(),
-      // fades in the add account button on componentDidMount. This animation can't be combined
       addAccountButtonFadeAnim: new Animated.Value(0),
       spinnerIsIndicating: false,
       formIsEditable: false,
@@ -346,17 +345,16 @@ export default class LoginForm extends Component {
                   passwordIsEditable: true}
                 );
               }}}>
+
               <Animated.View
                 style={[styles.addAccountButton, {opacity: this.state.addAccountButtonFadeAnim}]}>
                 <Animated.Image
                   style={{height: 20, width: 20, transform: [{rotate: spinCancelButtonInterpolation}] }}
                   source={require('./iconmonstr-plus-6-240.png')} />
-                  <View style={{width: 150, justifyContent: 'center', alignItems: 'center'}}>
-                    <Animated.Text
-                      style={{fontWeight: '600', fontSize: 14, color: 'white', opacity: this.state.buttonTextFadeAnim}}>
-                        {this.state.bottomButtonText}
-                    </Animated.Text>
-                  </View>
+                  <Animated.Text
+                    style={[styles.addAccountButtonText, {opacity: this.state.buttonTextFadeAnim}]}>
+                      {this.state.bottomButtonText}
+                  </Animated.Text>
               </Animated.View>
           </TouchableHighlight>
         </ScrollView>
@@ -405,6 +403,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center'
+  },
+  addAccountButtonText: {
+    width: 150,
+    textAlign: 'center',
+    fontWeight: '600',
+    fontSize: 14,
+    color: 'white'
   },
   addAccountForm: {
     flexDirection: 'column',
