@@ -21,18 +21,18 @@ export default class LoginForm extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      spinAnim: new Animated.Value(0),
-      colorAnim: new Animated.Value(0),
       logoFadeAnim: new Animated.Value(0),
       formFadeAnim: new Animated.Value(0),
-      indicatorAnim: new Animated.Value(0),
-      bottomTextAnim: new Animated.Value(1),
       serverFadeAnim: new Animated.Value(0),
       logoTransAnim: new Animated.ValueXY(),
       addAccountFadeAnim: new Animated.Value(0),
+      buttonIconSpinAnim: new Animated.Value(0),
+      buttonTextFadeAnim: new Animated.Value(1),
+      backgroundColorAnim: new Animated.Value(0),
       accountsListFadeAnim: new Animated.Value(0),
+      workingIndicatorAnim: new Animated.Value(0),
       addAcountFormTransAnim: new Animated.ValueXY(),
-      indicating: false,
+      spinnerIsIndicating: false,
       formIsEditable: false,
       serverIsEditable: false,
       usernameIsEditable: false,
@@ -46,38 +46,24 @@ export default class LoginForm extends Component {
   // Looping animation of the background color
   cycleColorAnimation() {
     Animated.timing(
-    this.state.colorAnim, {
+    this.state.backgroundColorAnim, {
       toValue: 1150,
       duration: 60000
     }).start(() => {
-      this.setState({colorAnim: new Animated.Value(0)});
+      this.setState({backgroundColorAnim: new Animated.Value(0)});
       this.cycleColorAnimation();
       });
   }
 
-  enableForm() {
-    this.setState({formIsEditable: true});
-  }
-
+  // TODO do something here with the auth
   validateServer() {
-    this.setState({indicating: false});
-    if (this.state.serverText == 'valid') {
-      this.setState({indicating: false})
-      Animated.timing(
-        this.state.formFadeAnim, {
-          toValue: 1,
-          duration: 1000
-        }
-      ).start(() => this.enableForm());
-    } else if(this.state.serverText == 'webauth') {
-      this.props.onForward()
-    }
+    this.setState({spinnerIsIndicating: false});
   }
 
   animateWorkingIndicator() {
-    this.setState({indicating: true})
+    this.setState({spinnerIsIndicating: true})
     Animated.timing(
-      this.state.indicatorAnim, {
+      this.state.workingIndicatorAnim, {
         toValue: 1,
         duration: 2000
       }).start(() => this.validateServer());
@@ -134,20 +120,20 @@ export default class LoginForm extends Component {
           toValue: {x: 0, y: 0}
       }),
       Animated.timing(
-        this.state.spinAnim, {
+        this.state.buttonIconSpinAnim, {
           toValue: 0,
           duration: 1000
       })
     ]).start();
 
     Animated.timing(
-      this.state.bottomTextAnim, {
+      this.state.buttonTextFadeAnim, {
         toValue: 0,
         duration: 300
     }).start(() => {
       this.setState({bottomButtonText: 'ADD ACCOUNT'});
       Animated.timing(
-        this.state.bottomTextAnim, {
+        this.state.buttonTextFadeAnim, {
           toValue: 1,
           duration: 300
         }).start()
@@ -173,20 +159,20 @@ export default class LoginForm extends Component {
           toValue: {x: 0, y: -250}
       }),
       Animated.timing(
-        this.state.spinAnim, {
+        this.state.buttonIconSpinAnim, {
           toValue: 1,
           duration: 1000
       })
     ]).start();
 
     Animated.timing(
-      this.state.bottomTextAnim, {
+      this.state.buttonTextFadeAnim, {
         toValue: 0,
         duration: 300
     }).start(() => {
       this.setState({bottomButtonText: 'CANCEL'});
       Animated.timing(
-        this.state.bottomTextAnim, {
+        this.state.buttonTextFadeAnim, {
           toValue: 1,
           duration: 300
         }).start()
@@ -201,7 +187,7 @@ export default class LoginForm extends Component {
         passwordPlaceholder: 'Password'
       };
 
-    var interpolatedColorAnimation = this.state.colorAnim.interpolate({
+    var interpolatedColorAnimation = this.state.backgroundColorAnim.interpolate({
         inputRange: [0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1150],
         outputRange: [
           'rgba(226, 32, 45, 1)', // Red
@@ -219,16 +205,16 @@ export default class LoginForm extends Component {
           'rgba(226, 32, 45, 1)'] // Red
     });
 
-    var spinCancelButtonInterpolation = this.state.spinAnim.interpolate({
+    var spinCancelButtonInterpolation = this.state.buttonIconSpinAnim.interpolate({
       inputRange: [0, 1],
       outputRange: ['0deg', '315deg']
     });
 
-    let spinner = (this.state.indicating) ? (
+    let spinner = (this.state.spinnerIsIndicating) ? (
       <ActivityIndicator
         color={'white'}
         style={styles.indicator}
-        animating={this.state.indicating}
+        animating={this.state.spinnerIsIndicating}
         />
       ) : (
         null
@@ -376,7 +362,7 @@ export default class LoginForm extends Component {
                   source={require('./iconmonstr-plus-6-240.png')} />
                   <View style={{width: 150, justifyContent: 'center', alignItems: 'center'}}>
                     <Animated.Text
-                      style={{fontWeight: '600', fontSize: 14, color: 'white', opacity: this.state.bottomTextAnim}}>
+                      style={{fontWeight: '600', fontSize: 14, color: 'white', opacity: this.state.buttonTextFadeAnim}}>
                         {this.state.bottomButtonText}
                     </Animated.Text>
                   </View>
