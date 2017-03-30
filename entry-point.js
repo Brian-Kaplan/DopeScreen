@@ -53,7 +53,6 @@ export default class DopeScreen extends Component {
       this.navigator.pop();
       return true;
     });
-
     return (
       <Navigator
         initialRoute={routes[0]}
@@ -82,13 +81,10 @@ export default class DopeScreen extends Component {
            style={{
              backgroundColor: 'white',
              opacity: this.state.navBarOpacity
-           }}
-         />
-       }
-      />
+           }}/>
+       }/>
     )
   }
-
 }
 
 AppRegistry.registerComponent('DopeScreen', () => DopeScreen);
