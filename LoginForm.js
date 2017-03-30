@@ -239,15 +239,7 @@ export default class LoginForm extends Component {
 
           {/* Accounts List */}
           <Animated.View
-            style={{
-              borderColor: 'white',
-              borderRadius: 5,
-              borderWidth: 2,
-              height: 250,
-              alignSelf: 'center',
-              width: 300,
-              opacity: this.state.accountsListFadeAnim,
-              marginTop: 200}}>
+            style={[styles.accountsList, {opacity: this.state.accountsListFadeAnim}]}>
             <ScrollView
               ref={innerHorizontalScrollRef}
               scrollEnabled={!this.state.isAddAccountFormShowing}
@@ -283,7 +275,7 @@ export default class LoginForm extends Component {
               }]}>
                 <View style={styles.serverRow}>
                   <View style={styles.serverInputBox}>
-                    <Text style={{paddingLeft: 10, paddingRight: 1, color: 'white', fontStyle: 'italic'}}>https://</Text>
+                    <Text style={styles.httpText}>https://</Text>
                     <TextInput
                       style={styles.serverInputText}
                       onChangeText={(serverText) => this.setState({serverText: serverText})}
@@ -413,6 +405,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 0
   },
+  accountsList: {
+    borderColor: 'white',
+    borderRadius: 5,
+    borderWidth: 2,
+    height: 250,
+    alignSelf: 'center',
+    width: 300,
+    marginTop: 200,
+  },
   serverRow: {
     width: 300,
     flexDirection: 'row',
@@ -451,6 +452,12 @@ const styles = StyleSheet.create({
   },
   indicator: {
     marginLeft: 10
+  },
+  httpText: {
+    paddingLeft: 10,
+    paddingRight: 1,
+    color: 'white',
+    fontStyle: 'italic'
   }
 });
 
