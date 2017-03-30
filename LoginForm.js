@@ -11,7 +11,6 @@ import {
   TouchableHighlight,
   ActivityIndicator,
   ScrollView,
-  KeyboardAvoidingView
 } from 'react-native';
 
 import Account from './AccountComponent'
@@ -23,15 +22,16 @@ export default class LoginForm extends Component {
     this.state = {
       logoFadeAnim: new Animated.Value(0),
       formFadeAnim: new Animated.Value(0),
-      serverFadeAnim: new Animated.Value(0),
+      addAccountFormFadeAnim: new Animated.Value(0),
       logoTransAnim: new Animated.ValueXY(),
-      addAccountFadeAnim: new Animated.Value(0),
       buttonIconSpinAnim: new Animated.Value(0),
       buttonTextFadeAnim: new Animated.Value(1),
       backgroundColorAnim: new Animated.Value(0),
       accountsListFadeAnim: new Animated.Value(0),
       workingIndicatorAnim: new Animated.Value(0),
       addAcountFormTransAnim: new Animated.ValueXY(),
+      // fades in the add account button on componentDidMount. This animation can't be combined
+      addAccountButtonFadeAnim: new Animated.Value(0),
       spinnerIsIndicating: false,
       formIsEditable: false,
       serverIsEditable: false,
@@ -70,57 +70,53 @@ export default class LoginForm extends Component {
     }
 
   componentDidMount() {
+    //Start the background color animation cycle
+    this.cycleColorAnimation();
+
+    // Animation sequence for fading the logo, button, and accounts list
     Animated.sequence([
-      Animated.timing(
-        this.state.logoFadeAnim,
-        {toValue: 1}
+      // Fade in the logo
+      Animated.timing(this.state.logoFadeAnim, {
+          toValue: 1
+        }
       ),
       Animated.parallel([
+        // transalte the logo vertically
         Animated.spring(this.state.logoTransAnim, {
             friction: 4,
             toValue: {x: 0, y: -200}
         }),
-        Animated.timing(
-          this.state.accountsListFadeAnim, {
+        // fade in the accounts list
+        Animated.timing(this.state.accountsListFadeAnim, {
             duration: 1000,
             toValue: 1
         }),
-        Animated.timing(
-          this.state.addAccountFadeAnim, {
+        // fade in the add account button
+        Animated.timing(this.state.addAccountButtonFadeAnim, {
             duration: 1000,
             toValue: 1
         })
       ]
     )
     ]).start();
-    this.cycleColorAnimation();
   }
 
   slideInAccountsList() {
     this.setState({isAddAccountFormShowing: false})
     Animated.parallel([
-      Animated.timing(
-        this.state.accountsListFadeAnim, {
+      Animated.timing(this.state.accountsListFadeAnim, {
           duration: 1000,
           toValue: 1
       }),
-      Animated.timing(
-        this.state.serverFadeAnim, {
+      Animated.timing(this.state.addAccountFormFadeAnim, {
           duration: 100,
           toValue: 0
       }),
-      Animated.timing(
-        this.state.formFadeAnim, {
-          toValue: 0,
-          duration: 100
-      }),
-      Animated.spring(
-        this.state.addAcountFormTransAnim, {
+      Animated.spring(this.state.addAcountFormTransAnim, {
           friction: 4,
           toValue: {x: 0, y: 0}
       }),
-      Animated.timing(
-        this.state.buttonIconSpinAnim, {
+      Animated.timing(this.state.buttonIconSpinAnim, {
           toValue: 0,
           duration: 1000
       })
@@ -149,7 +145,7 @@ export default class LoginForm extends Component {
           toValue: 0
       }),
       Animated.timing(
-        this.state.serverFadeAnim, {
+        this.state.addAccountFormFadeAnim, {
           duration: 1000,
           toValue: 1
       }),
@@ -281,50 +277,50 @@ export default class LoginForm extends Component {
 
           {/* Add Account Form */}
             <Animated.View
-              style={[ styles.addAccountForm, {transform: this.state.addAcountFormTransAnim.getTranslateTransform()}]}>
-                <Animated.View
-                  style={{opacity: this.state.serverFadeAnim}}>
-                  <View style={styles.serverRow}>
-                    <View style={styles.serverInputBox}>
-                      <Text style={{paddingLeft: 10, paddingRight: 1, color: 'white', fontStyle: 'italic'}}>https://</Text>
-                      <TextInput
-                        style={styles.serverInputText}
-                        onChangeText={(serverText) => this.setState({serverText: serverText})}
-                        value={this.state.serverText}
-                        editable={this.state.serverIsEditable}
-                        placeholder={staticStrings.serverPlaceholder}
-                        autoCorrect={false}
-                        autoCapitalize={'none'}
-                        placeholderTextColor={'#ffffff'}
-                        underlineColorAndroid={'rgba(0,0,0,0)'}
-                        onSubmitEditing={(event) => (
-                          this.animateWorkingIndicator()
-                        )}/>
-                    </View>
-                      {spinner}
+              style={[ styles.addAccountForm, {
+                opacity: this.state.addAccountFormFadeAnim,
+                transform: this.state.addAcountFormTransAnim.getTranslateTransform()
+              }]}>
+                <View style={styles.serverRow}>
+                  <View style={styles.serverInputBox}>
+                    <Text style={{paddingLeft: 10, paddingRight: 1, color: 'white', fontStyle: 'italic'}}>https://</Text>
+                    <TextInput
+                      style={styles.serverInputText}
+                      onChangeText={(serverText) => this.setState({serverText: serverText})}
+                      value={this.state.serverText}
+                      editable={this.state.serverIsEditable}
+                      placeholder={staticStrings.serverPlaceholder}
+                      autoCorrect={false}
+                      autoCapitalize={'none'}
+                      placeholderTextColor={'#ffffff'}
+                      underlineColorAndroid={'rgba(0,0,0,0)'}
+                      onSubmitEditing={(event) => (
+                        this.animateWorkingIndicator()
+                      )}/>
                   </View>
+                    {spinner}
+                </View>
 
-                  <TextInput
-                    style={styles.textInput }
-                    onChangeText={(usernameText) => this.setState({usernameText})}
-                    value={this.state.usernameText}
-                    editable={this.state.usernameIsEditable}
-                    autoCapitalize={'none'}
-                    autoCorrect={false}
-                    placeholder={staticStrings.usernamePlaceholder}
+                <TextInput
+                  style={styles.textInput }
+                  onChangeText={(usernameText) => this.setState({usernameText})}
+                  value={this.state.usernameText}
+                  editable={this.state.usernameIsEditable}
+                  autoCapitalize={'none'}
+                  autoCorrect={false}
+                  placeholder={staticStrings.usernamePlaceholder}
+                  placeholderTextColor={'#ffffff'}
+                  underlineColorAndroid={'rgba(0,0,0,0)'}/>
+
+                 <TextInput
+                    style={styles.textInput}
+                    onChangeText={(passwordText) => this.setState({passwordText})}
+                    value={this.state.passwordText}
+                    editable={this.state.passwordIsEditable}
+                    placeholder={staticStrings.passwordPlaceholder}
+                    secureTextEntry={true}
                     placeholderTextColor={'#ffffff'}
                     underlineColorAndroid={'rgba(0,0,0,0)'}/>
-
-                   <TextInput
-                      style={styles.textInput}
-                      onChangeText={(passwordText) => this.setState({passwordText})}
-                      value={this.state.passwordText}
-                      editable={this.state.passwordIsEditable}
-                      placeholder={staticStrings.passwordPlaceholder}
-                      secureTextEntry={true}
-                      placeholderTextColor={'#ffffff'}
-                      underlineColorAndroid={'rgba(0,0,0,0)'}/>
-                </Animated.View>
             </Animated.View>
 
           {/* Add Account Button */}
@@ -356,7 +352,7 @@ export default class LoginForm extends Component {
                 );
               }}}>
               <Animated.View
-                style={[styles.addAccountButton, {opacity: this.state.addAccountFadeAnim}]}>
+                style={[styles.addAccountButton, {opacity: this.state.addAccountButtonFadeAnim}]}>
                 <Animated.Image
                   style={{height: 20, width: 20, transform: [{rotate: spinCancelButtonInterpolation}] }}
                   source={require('./iconmonstr-plus-6-240.png')} />
