@@ -235,14 +235,16 @@ export default class LoginForm extends Component {
       );
 
     const { width } = Dimensions.get('window');
-    const refCallback = (node) => this.scrollRef = node;
+    const outerScrollRefCallback = (node) => this.outerScrollRef = node;
+    const innerHorizontalScrollRef = (node) => this.innerHorizontalRef = node;
+    const innerVerticalScrollRef = (node) => this.innerVerticalRef = node;
 
     return (
       <Animated.View style={[styles.container, {backgroundColor: interpolatedColorAnimation}]}>
         <ScrollView
-          ref={refCallback}
+          ref={outerScrollRefCallback}
           centerContent={true}
-          // scrollEnabled={this.state.isAddAccountFormShowing}
+          scrollEnabled={this.state.isAddAccountFormShowing}
           contentContainerStyle={{height: 750, width: width }}
           showsVerticalScrollIndicator={false}>
 
@@ -265,8 +267,12 @@ export default class LoginForm extends Component {
               opacity: this.state.accountsListFadeAnim,
               marginTop: 200}}>
             <ScrollView
+              ref={innerHorizontalScrollRef}
+              scrollEnabled={!this.state.isAddAccountFormShowing}
               horizontal={true}>
               <ScrollView
+                ref={innerVerticalScrollRef}
+                scrollEnabled={!this.state.isAddAccountFormShowing}
                 contentContainerStyle={{margin: 10}}>
                 <Account
                   domain={"https://home.appian.com/suite/tempo/tasks/assignedtome"}
@@ -342,14 +348,19 @@ export default class LoginForm extends Component {
             disabled={this.state.isAddAccountDisabled}
             style={styles.addAccountButtonWrapper}
             onPress={() => {
+              //Switch the state to either the accounts list or the add account form
               if (this.state.isAddAccountFormShowing) {
+                //Reset the position of the accounts list scrollviews
+                this.outerScrollRef.scrollTo({x: 0, y: 0, animated: true});
+                this.innerVerticalRef.scrollTo({x: 0, y: 0, animated: false});
+                this.innerHorizontalRef.scrollTo({x: 0, y: 0, animated: false});
+
                 this.slideInAccountsList();
                 this.setState({
                   serverIsEditable: false,
                   usernameIsEditable: false,
                   passwordIsEditable: false}
                 );
-                this.scrollRef.scrollTo({x: 0, y: 0, animated: true});
               } else {
                 this.slideInAddAccountForm();
                 this.setState({
