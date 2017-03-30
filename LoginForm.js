@@ -176,6 +176,10 @@ export default class LoginForm extends Component {
 
   renderLoginForm() {
 
+
+  }
+
+  render() {
     const staticStrings = {
         serverPlaceholder: 'example.com',
         usernamePlaceholder: 'Username',
@@ -360,12 +364,6 @@ export default class LoginForm extends Component {
         </ScrollView>
       </Animated.View>
     )
-  }
-
-  render() {
-    return (
-      this.renderLoginForm()
-    );
   }
 }
 
