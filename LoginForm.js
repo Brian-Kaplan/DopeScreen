@@ -231,9 +231,12 @@ export default class LoginForm extends Component {
           showsVerticalScrollIndicator={false}>
 
           {/* Appian Logo */}
-          <Animated.View style={[styles.appianLogo, { opacity: this.state.logoFadeAnim, transform: this.state.logoTransAnim.getTranslateTransform()}]}>
+          <Animated.View style={[styles.logoContainer, {
+            opacity: this.state.logoFadeAnim,
+            transform: this.state.logoTransAnim.getTranslateTransform()
+          }]}>
             <Image
-              style={{height: 169, width: 300, resizeMode: 'contain', alignSelf: 'center'}}
+              style={styles.logo}
               source={require('./Appian_white.png')} />
           </Animated.View>
 
@@ -375,12 +378,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexDirection: 'column'
   },
-  appianLogo: {
+  logoContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    paddingBottom: 0,
     marginBottom: 100,
     ...StyleSheet.absoluteFillObject
+  },
+  logo: {
+    height: 169,
+    width: 300,
+    resizeMode: 'contain',
   },
   addAccountButtonWrapper: {
     zIndex: 1,
