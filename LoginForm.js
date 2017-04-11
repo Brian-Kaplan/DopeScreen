@@ -11,6 +11,7 @@ import {
   TouchableHighlight,
   ActivityIndicator,
   ScrollView,
+  TouchableWithoutFeedback
 } from 'react-native';
 
 import Account from './AccountComponent'
@@ -30,6 +31,7 @@ export default class LoginForm extends Component {
       accountsListFadeAnim: new Animated.Value(0),
       workingIndicatorAnim: new Animated.Value(0),
       addAcountFormTransAnim: new Animated.ValueXY(),
+      bulkDeleteSpinYAnim: new Animated.Value(0),
       addAccountButtonFadeAnim: new Animated.Value(0),
       spinnerIsIndicating: false,
       formIsEditable: false,
@@ -174,11 +176,6 @@ export default class LoginForm extends Component {
     })
   }
 
-  renderLoginForm() {
-
-
-  }
-
   render() {
     const staticStrings = {
         serverPlaceholder: 'example.com',
@@ -207,6 +204,11 @@ export default class LoginForm extends Component {
     var spinCancelButtonInterpolation = this.state.buttonIconSpinAnim.interpolate({
       inputRange: [0, 1],
       outputRange: ['0deg', '315deg']
+    });
+
+    var bulkDeleteSpinInterpolation = this.state.bulkDeleteSpinYAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: ['0deg', '180deg']
     });
 
     let spinner = (this.state.spinnerIsIndicating) ? (
@@ -246,6 +248,15 @@ export default class LoginForm extends Component {
           {/* Accounts List */}
           <Animated.View
             style={[styles.accountsList, {opacity: this.state.accountsListFadeAnim}]}>
+            <TouchableHighlight
+              onPress={() => {
+                Animated.timing(this.state.bulkDeleteSpinYAnim, {
+                    toValue: 1,
+                    duration: 1000
+                }).start();
+              }}>
+              <Text>THIS IS A TEST</Text>
+            </TouchableHighlight>
             <ScrollView
               ref={innerHorizontalScrollRef}
               scrollEnabled={!this.state.isAddAccountFormShowing}
@@ -256,19 +267,24 @@ export default class LoginForm extends Component {
                 contentContainerStyle={{margin: 10}}>
                 <Account
                   domain={"https://home.appian.com/suite/tempo/tasks/assignedtome"}
-                  style={{marginBottom: 5}}/>
+                  style={{marginBottom: 5}}
+                  spinAnimTransform={{transform: [{rotateY: bulkDeleteSpinInterpolation}]}}/>
                 <Account
                   domain={"https://daily.appianci.net/suite/sites/aw17-integration-demos"}
-                  style={{marginBottom: 5}}/>
+                  style={{marginBottom: 5}}
+                  spinAnimTransform={{transform: [{rotateY: bulkDeleteSpinInterpolation}]}}/>
                 <Account
                   domain={"https://daily.appianci.net/suite/sites/buttoncolumns"}
-                  style={{marginBottom: 5}}/>
+                  style={{marginBottom: 5}}
+                  spinAnimTransform={{transform: [{rotateY: bulkDeleteSpinInterpolation}]}}/>
                 <Account
                   domain={"https://daily.appianci.net/suite/sites/buttoncolumns"}
-                  style={{marginBottom: 5}}/>
+                  style={{marginBottom: 5}}
+                  spinAnimTransform={{transform: [{rotateY: bulkDeleteSpinInterpolation}]}}/>
                 <Account
                   domain={"https://daily.appianci.net/suite/sites/buttoncolumns"}
-                  style={{marginBottom: 5}}/>
+                  style={{marginBottom: 5}}
+                  spinAnimTransform={{transform: [{rotateY: bulkDeleteSpinInterpolation}]}}/>
               </ScrollView>
             </ScrollView>
           </Animated.View>
@@ -365,6 +381,7 @@ export default class LoginForm extends Component {
       </Animated.View>
     )
   }
+
 }
 
 const styles = StyleSheet.create({
