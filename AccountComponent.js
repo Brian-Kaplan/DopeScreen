@@ -8,7 +8,8 @@ import {
   Alert,
   View,
   TouchableOpacity,
-  TouchableHighlight
+  TouchableHighlight,
+  ScrollView
 } from 'react-native';
 import styles from './AccountComponentStyleSheet';
 import Modal from 'react-native-modal'
@@ -18,11 +19,37 @@ export default class Account extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      modalVisible: false
+      modalVisible: false,
+      selectedForDeletion: false
     }
   }
 
+  getSide(isBulkDeleteMode) {
+    if (!isBulkDeleteMode) {
+      return (
+        <Animated.Image
+            style={styles.icon}
+            source={require('./brian_kaplan_180.jpg')}/>
+      );
+    }
+    const exInCircle = this.state.selectedForDeletion ? <Text style={{alignSelf: 'center', marginTop: 10, color: 'white', fontSize: 25}}>X</Text> : null;
+
+    return (
+      <TouchableOpacity
+        style={styles.icon}
+        activeOpacity={.6}
+        onPress={() => {
+          this.setState({selectedForDeletion: !this.state.selectedForDeletion});
+        }}>
+        {exInCircle}
+      </TouchableOpacity>
+    );
+  }
+
   render() {
+
+    const flipImage = this.getSide(this.props.isBulkDeleteMode)
+
     return (
       <Animated.View style={this.props.style}>
 
@@ -64,29 +91,28 @@ export default class Account extends Component {
             alignItems: 'center',
             justifyContent: 'flex-start'
           }}>
+            <View style={{marginTop: 75, alignItems: 'center', paddingLeft: 5, paddingRight: 5}}>
+              <Text
+                style={{fontWeight: 'bold', color: 'black'}}>
+                brian.kaplan
+              </Text>
 
-          <View style={{marginTop: 75, alignItems: 'center', paddingLeft: 20, paddingRight: 20}}>
-            <Text
-              style={{fontWeight: 'bold', color: 'black'}}>
-              brian.kaplan
-            </Text>
-
-            <Text
-              ellipsizeMode={'middle'}
-              numberOfLines={1}
-              style={{marginTop: 10, color: 'black'}}>
-              https://home.appian.com/suite/tempo/tasks/assignedtome
-            </Text>
+              <ScrollView
+                horizontal={true}>
+                <Text
+                  numberOfLines={1}
+                  style={{marginTop: 10, color: 'black'}}>
+                  https://home.appian.com/suite/tempo/tasks/assignedtome
+                </Text>
+              </ScrollView>
+              <TouchableOpacity style={{marginTop: 0}} onPress={() => {
+                this.setState({modalVisible: false});
+              }}>
+                <Text>Close</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-
-          <TouchableOpacity style={{marginTop: 75}} onPress={() => {
-            this.setState({modalVisible: false});
-          }}>
-            <Text>Close</Text>
-          </TouchableOpacity>
-
-          </View>
-        </Modal>
+      </Modal>
 
 
         <TouchableOpacity
@@ -95,13 +121,13 @@ export default class Account extends Component {
             this.setState({modalVisible: true});
           }}>
           <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Animated.Image
-                style={[styles.icon, this.props.spinAnimTransform]}
-                source={require('./brian_kaplan_180.jpg')}/>
+            <Animated.View style={this.props.spinAnimTransform}>
+              {flipImage}
+            </Animated.View>
             <View style={{marginLeft: 5, flexDirection: 'column'}}>
               <Text style={{color: 'white'}}>brian.kaplan</Text>
               <Text
-                style={{color: 'white'}}
+                style={{color: 'white', width: 230}}
                 ellipsizeMode={'middle'}
                 numberOfLines={1}>
                 {this.props.domain}

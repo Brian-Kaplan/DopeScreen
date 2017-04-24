@@ -8,8 +8,8 @@
   },
   "dependencies": {
     "react": "16.0.0-alpha.3",
-    "react-native": "0.43.1",
-    "react-native-modal": "^2.2.0"
+    "react-native": "latest",
+    "react-native-modal": "^2.3.2"
   },
   "devDependencies": {
     "babel-jest": "18.0.0",

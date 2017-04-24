@@ -11,7 +11,8 @@ import {
   TouchableHighlight,
   ActivityIndicator,
   ScrollView,
-  TouchableWithoutFeedback
+  TouchableWithoutFeedback,
+  TouchableOpacity
 } from 'react-native';
 
 import Account from './AccountComponent'
@@ -39,6 +40,7 @@ export default class LoginForm extends Component {
       usernameIsEditable: false,
       passwordIsEditable: false,
       isAddAccountDisabled: false,
+      isBulkDeleteMode: false,
       isAddAccountFormShowing: false,
       bottomButtonText: 'ADD ACCOUNT'
     };
@@ -223,7 +225,6 @@ export default class LoginForm extends Component {
 
     const { width } = Dimensions.get('window');
     const outerScrollRefCallback = (node) => this.outerScrollRef = node;
-    const innerHorizontalScrollRef = (node) => this.innerHorizontalRef = node;
     const innerVerticalScrollRef = (node) => this.innerVerticalRef = node;
 
     return (
@@ -248,44 +249,35 @@ export default class LoginForm extends Component {
           {/* Accounts List */}
           <Animated.View
             style={[styles.accountsList, {opacity: this.state.accountsListFadeAnim}]}>
-            <TouchableHighlight
-              onPress={() => {
-                Animated.timing(this.state.bulkDeleteSpinYAnim, {
-                    toValue: 1,
-                    duration: 1000
-                }).start();
-              }}>
-              <Text>THIS IS A TEST</Text>
-            </TouchableHighlight>
             <ScrollView
-              ref={innerHorizontalScrollRef}
+              ref={innerVerticalScrollRef}
               scrollEnabled={!this.state.isAddAccountFormShowing}
-              horizontal={true}>
-              <ScrollView
-                ref={innerVerticalScrollRef}
-                scrollEnabled={!this.state.isAddAccountFormShowing}
-                contentContainerStyle={{margin: 10}}>
-                <Account
-                  domain={"https://home.appian.com/suite/tempo/tasks/assignedtome"}
-                  style={{marginBottom: 5}}
-                  spinAnimTransform={{transform: [{rotateY: bulkDeleteSpinInterpolation}]}}/>
-                <Account
-                  domain={"https://daily.appianci.net/suite/sites/aw17-integration-demos"}
-                  style={{marginBottom: 5}}
-                  spinAnimTransform={{transform: [{rotateY: bulkDeleteSpinInterpolation}]}}/>
-                <Account
-                  domain={"https://daily.appianci.net/suite/sites/buttoncolumns"}
-                  style={{marginBottom: 5}}
-                  spinAnimTransform={{transform: [{rotateY: bulkDeleteSpinInterpolation}]}}/>
-                <Account
-                  domain={"https://daily.appianci.net/suite/sites/buttoncolumns"}
-                  style={{marginBottom: 5}}
-                  spinAnimTransform={{transform: [{rotateY: bulkDeleteSpinInterpolation}]}}/>
-                <Account
-                  domain={"https://daily.appianci.net/suite/sites/buttoncolumns"}
-                  style={{marginBottom: 5}}
-                  spinAnimTransform={{transform: [{rotateY: bulkDeleteSpinInterpolation}]}}/>
-              </ScrollView>
+              contentContainerStyle={{margin: 10}}>
+              <Account
+                domain={"https://home.appian.com/suite/tempo/tasks/assignedtome"}
+                style={{marginBottom: 5}}
+                isBulkDeleteMode={this.state.isBulkDeleteMode}
+                spinAnimTransform={{transform: [{rotateY: bulkDeleteSpinInterpolation}]}}/>
+              <Account
+                domain={"https://daily.appianci.net/suite/sites/aw17-integration-demos"}
+                style={{marginBottom: 5}}
+                isBulkDeleteMode={this.state.isBulkDeleteMode}
+                spinAnimTransform={{transform: [{rotateY: bulkDeleteSpinInterpolation}]}}/>
+              <Account
+                domain={"https://daily.appianci.net/suite/sites/buttoncolumns"}
+                style={{marginBottom: 5}}
+                isBulkDeleteMode={this.state.isBulkDeleteMode}
+                spinAnimTransform={{transform: [{rotateY: bulkDeleteSpinInterpolation}]}}/>
+              <Account
+                domain={"https://daily.appianci.net/suite/sites/buttoncolumns"}
+                style={{marginBottom: 5}}
+                isBulkDeleteMode={this.state.isBulkDeleteMode}
+                spinAnimTransform={{transform: [{rotateY: bulkDeleteSpinInterpolation}]}}/>
+              <Account
+                domain={"https://daily.appianci.net/suite/sites/buttoncolumns"}
+                style={{marginBottom: 5}}
+                isBulkDeleteMode={this.state.isBulkDeleteMode}
+                spinAnimTransform={{transform: [{rotateY: bulkDeleteSpinInterpolation}]}}/>
             </ScrollView>
           </Animated.View>
 
@@ -338,45 +330,64 @@ export default class LoginForm extends Component {
             </Animated.View>
 
           {/* Add Account Button */}
-          <TouchableHighlight
-            underlayColor={null}
+          <View style={styles.addAccountButtonWrapper}>
+            <TouchableHighlight
+              underlayColor={null}
+              activeOpacity={.6}
+              disabled={this.state.isAddAccountDisabled}
+              onPress={() => {
+                //Switch the state to either the accounts list or the add account form
+                if (this.state.isAddAccountFormShowing) {
+                  //Reset the position of the accounts list scrollviews
+                  this.outerScrollRef.scrollTo({x: 0, y: 0, animated: true});
+                  this.innerVerticalRef.scrollTo({x: 0, y: 0, animated: false});
+
+                  this.slideInAccountsList();
+                  this.setState({
+                    serverIsEditable: false,
+                    usernameIsEditable: false,
+                    passwordIsEditable: false}
+                  );
+                } else {
+                  this.slideInAddAccountForm();
+                  this.setState({
+                    serverIsEditable: true,
+                    usernameIsEditable: true,
+                    passwordIsEditable: true}
+                  );
+                }}}>
+
+                <Animated.View
+                  style={[styles.addAccountButton, {opacity: this.state.addAccountButtonFadeAnim}]}>
+                  <Animated.Image
+                    style={{height: 20, width: 20, transform: [{rotate: spinCancelButtonInterpolation}] }}
+                    source={require('./iconmonstr-plus-6-240.png')} />
+                    <Animated.Text
+                      style={[styles.addAccountButtonText, {opacity: this.state.buttonTextFadeAnim}]}>
+                        {this.state.bottomButtonText}
+                    </Animated.Text>
+                </Animated.View>
+            </TouchableHighlight>
+          </View>
+
+          {/* Edit Accounts Button */}
+          <TouchableOpacity
+            style={{alignSelf: 'center'}}
             activeOpacity={.6}
-            disabled={this.state.isAddAccountDisabled}
-            style={styles.addAccountButtonWrapper}
             onPress={() => {
-              //Switch the state to either the accounts list or the add account form
-              if (this.state.isAddAccountFormShowing) {
-                //Reset the position of the accounts list scrollviews
-                this.outerScrollRef.scrollTo({x: 0, y: 0, animated: true});
-                this.innerVerticalRef.scrollTo({x: 0, y: 0, animated: false});
-                this.innerHorizontalRef.scrollTo({x: 0, y: 0, animated: false});
-
-                this.slideInAccountsList();
-                this.setState({
-                  serverIsEditable: false,
-                  usernameIsEditable: false,
-                  passwordIsEditable: false}
-                );
-              } else {
-                this.slideInAddAccountForm();
-                this.setState({
-                  serverIsEditable: true,
-                  usernameIsEditable: true,
-                  passwordIsEditable: true}
-                );
-              }}}>
-
-              <Animated.View
-                style={[styles.addAccountButton, {opacity: this.state.addAccountButtonFadeAnim}]}>
-                <Animated.Image
-                  style={{height: 20, width: 20, transform: [{rotate: spinCancelButtonInterpolation}] }}
-                  source={require('./iconmonstr-plus-6-240.png')} />
-                  <Animated.Text
-                    style={[styles.addAccountButtonText, {opacity: this.state.buttonTextFadeAnim}]}>
-                      {this.state.bottomButtonText}
-                  </Animated.Text>
-              </Animated.View>
-          </TouchableHighlight>
+              Animated.timing(this.state.bulkDeleteSpinYAnim, {
+                  toValue: .5,
+                  duration: 250
+              }).start(() => {
+                this.setState({isBulkDeleteMode: !this.state.isBulkDeleteMode});
+                Animated.timing(this.state.bulkDeleteSpinYAnim, {
+                    toValue: this.state.isBulkDeleteMode ? 1 : 0,
+                    duration: 250
+                }).start();
+              })
+            }}>
+            <Animated.Text style={{color: 'white', opacity: this.state.accountsListFadeAnim}}>Edit Accounts</Animated.Text>
+          </TouchableOpacity>
         </ScrollView>
       </Animated.View>
     )
@@ -403,7 +414,6 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
   },
   addAccountButtonWrapper: {
-    zIndex: 1,
     marginTop: 500,
     height: 40,
     alignItems: 'center',
