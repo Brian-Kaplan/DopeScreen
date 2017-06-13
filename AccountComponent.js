@@ -1,18 +1,13 @@
 import React, { Component, PropTypes } from 'react';
 import {
-  AppRegistry,
   StyleSheet,
   Text,
   Image,
-  Animated,
-  Alert,
   View,
-  TouchableOpacity,
-  TouchableHighlight,
-  ScrollView
+  TouchableOpacity
 } from 'react-native';
 import styles from './AccountComponentStyleSheet';
-import Modal from 'react-native-modal'
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 export default class Account extends Component {
 
@@ -24,118 +19,38 @@ export default class Account extends Component {
     }
   }
 
-  getSide(isBulkDeleteMode) {
-    if (!isBulkDeleteMode) {
+  getIcon() {
+    if (!this.props.isBulkDeleteMode) {
       return (
-        <Animated.Image
-            style={styles.icon}
-            source={require('./brian_kaplan_180.jpg')}/>
+        <Icon style={styles.icon} name="sign-in" size={30} color='white' />
       );
     }
-    const exInCircle = this.state.selectedForDeletion ? <Text style={{alignSelf: 'center', marginTop: 10, color: 'white', fontSize: 25}}>X</Text> : null;
-
     return (
-      <TouchableOpacity
-        style={styles.icon}
-        activeOpacity={.6}
-        onPress={() => {
-          this.setState({selectedForDeletion: !this.state.selectedForDeletion});
-        }}>
-        {exInCircle}
-      </TouchableOpacity>
+      <Icon style={styles.icon} name="close" size={30} color='white' />
     );
   }
 
   render() {
-
-    const flipImage = this.getSide(this.props.isBulkDeleteMode)
-
+    const icon = this.getIcon();
     return (
-      <Animated.View style={this.props.style}>
-
-        <Modal
-          style={styles.modal}
-            backdropOpacity={.6}
-            animationInTiming={500}
-            animationOutTiming={500}
-            isVisible={this.state.modalVisible}>
-
-          {/* Floating Circular Account Image */}
-          <Image
-              style={{
-                alignItems: 'center',
-                marginTop: 20,
-                marginLeft: 100,
-                zIndex: 1,
-                height: 100,
-                width: 100,
-                borderRadius: 50,
-                borderColor: 'white',
-                borderWidth: 1,
-                overflow: 'hidden',
-                ...StyleSheet.absoluteFillObject,
-              }}
-              source={require('./brian_kaplan_180.jpg')}/>
-
-          {/* The upper part of the view used to make the circular image look like its floating */}
-          <View style={{flex: .25, backgroundColor: 'transparent'}}/>
-
-          {/* The lower part of the view used to make the cirular image look like its floating */}
-          <View style={{
-            flex: .75,
-            borderRadius: 5,
-            borderWidth: 2,
-            borderColor: 'white',
-            backgroundColor: 'white',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'flex-start'
-          }}>
-            <View style={{marginTop: 75, alignItems: 'center', paddingLeft: 5, paddingRight: 5}}>
-              <Text
-                style={{fontWeight: 'bold', color: 'black'}}>
-                brian.kaplan
-              </Text>
-
-              <ScrollView
-                horizontal={true}>
-                <Text
-                  numberOfLines={1}
-                  style={{marginTop: 10, color: 'black'}}>
-                  https://home.appian.com/suite/tempo/tasks/assignedtome
-                </Text>
-              </ScrollView>
-              <TouchableOpacity style={{marginTop: 0}} onPress={() => {
-                this.setState({modalVisible: false});
-              }}>
-                <Text>Close</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-      </Modal>
-
-
         <TouchableOpacity
-          activeOpacity={.6}
-          onLongPress={() => {
-            this.setState({modalVisible: true});
-          }}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <Animated.View style={this.props.spinAnimTransform}>
-              {flipImage}
-            </Animated.View>
-            <View style={{marginLeft: 5, flexDirection: 'column'}}>
-              <Text style={{color: 'white'}}>brian.kaplan</Text>
+          activeOpacity={.6}>
+          <View style={styles.accountContainer}>
+            <Image
+                style={styles.accountImage}
+                source={require('./brian_kaplan_180.jpg')}/>
+            <View style={styles.accountTextContainer}>
+              <Text style={styles.usernameText}>brian.kaplan</Text>
               <Text
-                style={{color: 'white', width: 230}}
+                style={styles.domainText}
                 ellipsizeMode={'middle'}
                 numberOfLines={1}>
                 {this.props.domain}
               </Text>
             </View>
+            {icon}
           </View>
         </TouchableOpacity>
-      </Animated.View>
     );
   }
 }
